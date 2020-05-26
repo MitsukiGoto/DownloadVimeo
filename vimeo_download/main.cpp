@@ -43,7 +43,7 @@ std::tuple<std::string, std::string, bool, bool> parseArgument(int argc, const c
         std::exit(0);
     }
     if(vm.count("version")) {
-        std::cout << "Download Tetsuryoku Video(v1.2)" << std::endl;
+        std::cout << "Download Vimeo (v1.2)" << std::endl;
         std::exit(0);
     }
     if(!vm.count("url") || !vm.count("output")) {
