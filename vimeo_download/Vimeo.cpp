@@ -13,7 +13,6 @@
 #include <tuple>
 #include <filesystem>
 #include <future>
-#include <array>
 #include <cstdlib>
 #include <vector>
 #include <fstream>
@@ -23,7 +22,9 @@
 Vimeo::Vimeo(const std::string& oupput_name, const std::string& url, std::unique_ptr<JSON> json, bool verbose) : output_name(oupput_name),url(url),verbose(verbose) {
     this->json = std::move(json);
     this->base_url = std::regex_replace(url, std::regex(R"(sep/.+)"), "");
-    this->tmp_dir = std::string(std::filesystem::temp_directory_path());
+    auto paths = createDirectory();
+    this->tmp_dir = paths[0];
+    this->save_dir = paths[1];
 }
 
 void Vimeo::merge() {
@@ -48,6 +49,17 @@ Vimeo& Vimeo::download() {
     process1.join();
     process2.join();
     return *this;
+}
+
+std::array<std::string, 2> Vimeo::createDirectory() {
+    std::array<std::string, 2> paths;
+    std::string tmp = std::filesystem::temp_directory_path().string()+"dlvimeo/";
+    std::filesystem::create_directories(tmp);
+    paths[0] = tmp;
+    std::string saved = std::string(std::getenv("HOME"))+"/Desktop/VVimeo";
+    std::filesystem::create_directories(saved);
+    paths[1] = saved;
+    return paths;
 }
 
 void Vimeo::downloadVideo() {

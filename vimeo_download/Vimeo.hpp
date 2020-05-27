@@ -12,6 +12,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <array>
 #include "JSON.hpp"
 
 class Vimeo {
@@ -23,10 +24,12 @@ public:
 private:
     void downloadVideo();
     void downloadAudio();
+    std::array<std::string, 2> createDirectory();
     std::unique_ptr<JSON> json;
     std::string url;
     std::string base_url;
     std::string tmp_dir;
+    std::string save_dir;
     std::string output_name;
     bool verbose;
 };
