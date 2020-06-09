@@ -12,18 +12,26 @@
 #include <regex>
 #include <tuple>
 #include <filesystem>
+#include <chrono>
 #include <future>
-#include <array>
 #include <cstdlib>
 #include <vector>
 #include <fstream>
 #include <sstream>
 #include <iterator>
 
+namespace {
+auto decode = [](std::string encodedStr){
+    return cppcodec::base64_rfc4648::decode(encodedStr);
+};
+}
+
 Vimeo::Vimeo(const std::string& oupput_name, const std::string& url, std::unique_ptr<JSON> json, bool verbose) : output_name(oupput_name),url(url),verbose(verbose) {
     this->json = std::move(json);
     this->base_url = std::regex_replace(url, std::regex(R"(sep/.+)"), "");
-    this->tmp_dir = std::string(std::filesystem::temp_directory_path());
+    auto paths = createDirectory();
+    this->tmp_dir = paths[0];
+    this->save_dir = paths[1];
 }
 
 void Vimeo::merge() {
@@ -50,6 +58,20 @@ Vimeo& Vimeo::download() {
     return *this;
 }
 
+std::array<std::string, 2> Vimeo::createDirectory() {
+    std::array<std::string, 2> paths;
+    auto now_c = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::stringstream ss;
+    ss << std::put_time(localtime(&now_c), "%Y%m%d_%H%M%S");
+    std::string tmp = std::filesystem::temp_directory_path().string()+"dlvimeo/"+ss.str()+"/";
+    std::filesystem::create_directories(tmp);
+    paths[0] = tmp;
+    std::string saved = std::string(std::getenv("HOME"))+"/Desktop/Vimeo";
+    std::filesystem::create_directories(saved);
+    paths[1] = saved;
+    return paths;
+}
+
 void Vimeo::downloadVideo() {
     auto video = json->v.get<picojson::object>()["video"].get<picojson::array>();
     int i = 0;
@@ -66,7 +88,7 @@ void Vimeo::downloadVideo() {
     if(this->verbose){
         std::cout << "video_base_url: " << video_base_url <<  std::endl;
     }
-    auto decoded = cppcodec::base64_rfc4648::decode(highest_video.at("init_segment").to_str());
+    auto decoded = decode(highest_video.at("init_segment").to_str());
     std::ofstream ofs(this->tmp_dir+"v.mp4", std::ios::out|std::ios::binary);
     std::stringstream s;
     std::move(decoded.begin(), decoded.end(), std::ostream_iterator<unsigned char>(s));
@@ -88,7 +110,7 @@ void Vimeo::downloadAudio() {
     if(this->verbose){
         std::cout << "audio_base_url: " << audio_base_url <<  std::endl;
     }
-    auto decoded = cppcodec::base64_rfc4648::decode(audio.at("init_segment").to_str());
+    auto decoded = decode(audio.at("init_segment").to_str());
     std::ofstream ofs(this->tmp_dir+"a.mp3", std::ios::out|std::ios::binary);
     std::stringstream s;
     std::move(decoded.begin(), decoded.end(), std::ostream_iterator<unsigned char>(s));

@@ -587,6 +587,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 44W8AGS93F;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/boost/1.72.0_2/include,
 					/usr/local/Cellar/curl/7.67.0/include,
@@ -608,6 +609,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 44W8AGS93F;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/boost/1.72.0_2/include,
 					/usr/local/Cellar/curl/7.67.0/include,
