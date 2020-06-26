@@ -31,7 +31,7 @@ private:
     std::string tmp_dir;
     std::string save_dir;
     std::string output_name;
-    bool verbose;
+    bool isVerbose;
 };
 
 #endif /* VimeoParse_hpp */
