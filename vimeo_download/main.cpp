@@ -13,19 +13,14 @@
 #include <boost/program_options.hpp>
 #include <tuple>
 #include "Vimeo.hpp"
+#include "ParsedArg.hpp"
 #include "Requests.hpp"
 
-#ifdef __APPLE__
-#elif __CYGWIN__
-#else
-#error "UN-SUPPORTED COMPILER"
-#endif
-
 namespace {
-std::tuple<std::string, std::string, bool, bool> parseArgument(int argc, const char** argv) {
+auto parseArgument(int argc, const char** argv) {
     std::tuple<std::string, std::string, bool, bool> options;
-    boost::program_options::options_description description("Download Vimeo Video even if it set Private \n"
-                                                            "Usage: vimeo_download [-u URL] [-o OUTPUT]");
+    boost::program_options::options_description description("Download Vimeo Video even though it is set Private \n"
+                                                            "Usage: vimeo_download [-u URL] [-o Output]");
     description.add_options()
     ("url,u", boost::program_options::value<std::string>(), "Set Target URL")
     ("output,o", boost::program_options::value<std::string>(), "Set output name")
@@ -59,21 +54,16 @@ std::tuple<std::string, std::string, bool, bool> parseArgument(int argc, const c
     } else {
         std::get<2>(options) = false;
     }
-    if(vm.count("continue")) {
-        std::get<3>(options) = true;
-    } else {
-        std::get<3>(options) = false;
-    }
-    
-    return options;
+    auto parsedArg = std::make_unique<ParsedArg>(std::get<0>(options), std::get<1>(options), std::get<2>(options));
+    return parsedArg;
 }
 }
 
 int main(int argc, const char * argv[]) {
     //     Expected: output, url
-    auto options = parseArgument(argc, argv);
-    if(std::get<2>(options)) std::cout << "Verbose Mode on" << std::endl;
-    auto vimeo = std::make_unique<Vimeo>(std::get<0>(options), std::get<1>(options), Requests::get(std::get<1>(options)), std::get<2>(options));
+    auto arg = parseArgument(argc, argv);
+    if(arg->isVerbose) std::cout << "Verbose Mode on" << std::endl;
+    auto vimeo = std::make_unique<Vimeo>(arg->outputName, arg->url, Requests::get(arg->url), arg->isVerbose);
     vimeo->download().merge();
 #ifdef __APPLE__
         std::system("osascript -e 'display notification \"Finish\"'");

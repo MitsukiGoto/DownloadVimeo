@@ -26,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7B24B04C25BF7541008EE965 /* parsedArg.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = parsedArg.hpp; sourceTree = "<group>"; };
 		7B3AAE38246A7DEB005161E7 /* vimeo_download */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vimeo_download; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B3AAE3B246A7DEB005161E7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		7B3AAECB246BE051005161E7 /* vimeo_download.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vimeo_download.entitlements; sourceTree = "<group>"; };
@@ -68,6 +69,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7B24B04A25BF7526008EE965 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				7B24B04C25BF7541008EE965 /* parsedArg.hpp */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
 		7B3AAE2F246A7DEB005161E7 = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +97,7 @@
 		7B3AAE3A246A7DEB005161E7 /* vimeo_download */ = {
 			isa = PBXGroup;
 			children = (
+				7B24B04A25BF7526008EE965 /* model */,
 				7B3AAECB246BE051005161E7 /* vimeo_download.entitlements */,
 				7B3AAE3B246A7DEB005161E7 /* main.cpp */,
 				7B95BD44246FBD060016CCE7 /* Vimeo.cpp */,
@@ -322,7 +332,7 @@
 		7B3AAE40246A7DEB005161E7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++2a";
 				CODE_SIGN_ENTITLEMENTS = vimeo_download/vimeo_download.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 44W8AGS93F;
@@ -341,7 +351,7 @@
 		7B3AAE41246A7DEB005161E7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++2a";
 				CODE_SIGN_ENTITLEMENTS = vimeo_download/vimeo_download.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 44W8AGS93F;
