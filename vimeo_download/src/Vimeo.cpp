@@ -8,7 +8,7 @@
 
 #include "Vimeo.hpp"
 #include "Requests.hpp"
-#include "Util/cppcodec/base64_rfc4648.hpp"
+#include "../include/cppcodec/base64_rfc4648.hpp"
 #include <regex>
 #include <tuple>
 #include <filesystem>

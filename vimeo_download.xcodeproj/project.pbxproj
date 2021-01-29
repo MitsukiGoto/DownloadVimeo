@@ -72,9 +72,32 @@
 		7B24B04A25BF7526008EE965 /* model */ = {
 			isa = PBXGroup;
 			children = (
+				7B95BD4E247035220016CCE7 /* picojson.h */,
 				7B24B04C25BF7541008EE965 /* parsedArg.hpp */,
+				7B95BD45246FBD060016CCE7 /* Vimeo.hpp */,
 			);
 			path = model;
+			sourceTree = "<group>";
+		};
+		7B24B05425C47798008EE965 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				7B24B04A25BF7526008EE965 /* model */,
+				7B95BD4B247034180016CCE7 /* JSON.hpp */,
+				7B95BD48246FE9F60016CCE7 /* Requests.hpp */,
+				7B95BD57247118410016CCE7 /* cppcodec */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		7B24B05525C477C5008EE965 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				7B95BD44246FBD060016CCE7 /* Vimeo.cpp */,
+				7B95BD47246FE9F60016CCE7 /* Requests.cpp */,
+				7B95BD4A247034180016CCE7 /* JSON.cpp */,
+			);
+			path = src;
 			sourceTree = "<group>";
 		};
 		7B3AAE2F246A7DEB005161E7 = {
@@ -97,12 +120,10 @@
 		7B3AAE3A246A7DEB005161E7 /* vimeo_download */ = {
 			isa = PBXGroup;
 			children = (
-				7B24B04A25BF7526008EE965 /* model */,
-				7B3AAECB246BE051005161E7 /* vimeo_download.entitlements */,
+				7B24B05525C477C5008EE965 /* src */,
+				7B24B05425C47798008EE965 /* include */,
 				7B3AAE3B246A7DEB005161E7 /* main.cpp */,
-				7B95BD44246FBD060016CCE7 /* Vimeo.cpp */,
-				7B95BD45246FBD060016CCE7 /* Vimeo.hpp */,
-				7B95BD4F247044CE0016CCE7 /* Util */,
+				7B3AAECB246BE051005161E7 /* vimeo_download.entitlements */,
 			);
 			path = vimeo_download;
 			sourceTree = "<group>";
@@ -112,19 +133,6 @@
 			children = (
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		7B95BD4F247044CE0016CCE7 /* Util */ = {
-			isa = PBXGroup;
-			children = (
-				7B95BD57247118410016CCE7 /* cppcodec */,
-				7B95BD47246FE9F60016CCE7 /* Requests.cpp */,
-				7B95BD48246FE9F60016CCE7 /* Requests.hpp */,
-				7B95BD4A247034180016CCE7 /* JSON.cpp */,
-				7B95BD4B247034180016CCE7 /* JSON.hpp */,
-				7B95BD4E247035220016CCE7 /* picojson.h */,
-			);
-			path = Util;
 			sourceTree = "<group>";
 		};
 		7B95BD57247118410016CCE7 /* cppcodec */ = {
