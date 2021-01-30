@@ -13,7 +13,7 @@
 
 class ParsedArg {
 public:
-    ParsedArg(std::string outputName, std::string url, bool isVerbose) : outputName(outputName), url(url), isVerbose(isVerbose){}
+    ParsedArg(std::string outputName, std::string url, bool isVerbose) : url(url), outputName(outputName), isVerbose(isVerbose) {}
     std::string url;
     std::string outputName;
     bool isVerbose;

@@ -32,7 +32,7 @@ constexpr auto command(T tmp, U name) {
 }
 }
 
-Vimeo::Vimeo(const std::string& oupput_name, const std::string& url, std::unique_ptr<JSON> json, bool verbose) : output_name(oupput_name),url(url),isVerbose(verbose) {
+Vimeo::Vimeo(const std::string& output_name, const std::string& url, std::unique_ptr<JSON> json, bool isVerbose) : url(url) ,output_name(output_name), isVerbose(isVerbose) {
     this->json = std::move(json);
     this->base_url = std::regex_replace(url, std::regex(R"(sep/.+)"), "");
     auto paths = createDirectory();

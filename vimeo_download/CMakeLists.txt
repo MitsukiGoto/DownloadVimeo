@@ -4,6 +4,7 @@ add_executable(download_vimeo main.cpp)
 
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+add_definitions(-Wall -Wextra -O2)
 
 add_subdirectory(src)
 
