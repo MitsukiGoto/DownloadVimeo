@@ -64,10 +64,15 @@ void Vimeo::merge() {
 }
 
 Vimeo& Vimeo::download() {
+#ifdef APPLE
     auto process1 = std::thread([this]{this->downloadVideo();});
     auto process2 = std::thread([this]{this->downloadAudio();});
     process1.join();
     process2.join();
+#else
+    this->downloadVideo();
+    this->downloadAudio();
+#endif
     return *this;
 }
 

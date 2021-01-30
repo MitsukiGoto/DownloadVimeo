@@ -1,4 +1,6 @@
 ## This is C++ version of https://github.com/eMBee/vimeo-download
-Only Support for Mac, but add few changes this will success to  compile on Windows I think \
+![CMake](https://github.com/MitsukiGoto/DownloadVimeo/workflows/CMake/badge.svg) \
+Full Supporting Mac \
+Linux and Windows version will come soon \
 This Requires boost.programoptions, libcurl, cppcodec \
 Please be careful for copyright
