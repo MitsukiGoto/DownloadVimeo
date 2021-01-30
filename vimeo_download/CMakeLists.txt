@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.5)
+project(download_vimeo)
+add_executable(download_vimeo main.cpp)
+
+set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+
+add_subdirectory(src)
+
+target_link_libraries(download_vimeo vimeocore)
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+find_package(Boost REQUIRED program_options)
+if(Boost_FOUND)
+    message(STATUS "!!! BOOST FOUND !!!")
+else()
+    message(STATUS "!!! BOOST NOT FOUND !!!")
+endif()
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(download_vimeo ${Boost_LIBRARIES} -lcurl)

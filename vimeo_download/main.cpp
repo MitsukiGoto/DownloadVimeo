@@ -12,8 +12,8 @@
 #include <cstdlib>
 #include <boost/program_options.hpp>
 #include <tuple>
-#include "Vimeo.hpp"
-#include "ParsedArg.hpp"
+#include "include/Vimeo.hpp"
+#include "include/model/parsedArg.hpp"
 #include "Requests.hpp"
 
 namespace {
