@@ -34,16 +34,12 @@ jobs:
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake ../vimeo_download/CMakeLists.txt -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-      
-    - name: command
-      working-directory: ${{github.workspace}}/build
-      run: find /usr/include/ -name "*boost*"; find /usr/lib/ -name "*boost*"
 
     - name: Build
       working-directory: ${{github.workspace}}/build
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build /home/runner/work/DownloadVimeo/DownloadVimeo/vimeo_download --config $BUILD_TYPE
+      run: cmake --build ../vimeo_download --config $BUILD_TYPE
 
     - name: Test
       working-directory: ${{github.workspace}}/build
