@@ -2,4 +2,4 @@
 !*.xcodeproj/project.pbxproj
 !*.xcworkspace/contents.xcworkspacedata
 .vscode/
-vimeo_download/build/*
+DownloadVimeo/build/

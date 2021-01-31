@@ -1,25 +1,18 @@
-name: CMake
-
-push:
+on:
+  push:
     tags:
-      - '!v*'
+      - 'v*'
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+name: Create Release
 
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    name: Create Release
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Create Build Environment
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
       # We'll use this as our working directory for all subsequent commands
       run: cmake -E make_directory ${{github.workspace}}/build -DACTIONS=TRUE
@@ -43,9 +36,24 @@ jobs:
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: cmake --build ../vimeo_download --config $BUILD_TYPE
 
-    - name: Test
+    - name: zipping
       working-directory: ${{github.workspace}}/build
       shell: bash
-      # Execute tests defined by the CMake configuration.  
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C $BUILD_TYPE
+      run: zip download_vimeo.zip ./download_vimeo
+    
+    - name: Create Release
+        id: create_release
+        working-directory: ${{github.workspace}}/build
+        uses: actions/create-release@v1
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./download_vimeo.zip
+          asset_name: download_vimeo.zip
+          asset_content_type: application/zip
+          draft: false
+          prerelease: false
