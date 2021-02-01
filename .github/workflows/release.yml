@@ -43,7 +43,6 @@ jobs:
       run: zip download_vimeo.zip ./download_vimeo
     
     - name: Create Release
-        id: create_release
         working-directory: ${{github.workspace}}/build
         uses: actions/create-release@v1
         env:
@@ -55,7 +54,6 @@ jobs:
           prerelease: false
 
     - name: add binray
-        id: add_binary
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
