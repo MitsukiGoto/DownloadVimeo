@@ -4,16 +4,16 @@ https://github.com/tplgy/cppcodec \
 https://github.com/eMBee/vimeo-download
 ### Features
 This enables you to download videos hosted by vimeo which cannot download by youtube-dl.
-### Requirement
+### Depedencies
 libcurl, boost.program_options, ffmpeg
 ### Installation
 **For macOS Users**
-1. If your Mac is not installed required library, please run the following command.
+1. If your Mac is not installed required library, please run the following commands.
 ```
 brew install ffmpeg
 brew install boost
 ``` 
-2.  Run the following command to build.
+2.  Run the following commands to build.
 ```
 cd build
 cmake ../vimeo_download
