@@ -40,6 +40,7 @@ Vimeo::Vimeo(const std::string& output_name, const std::string& url, std::unique
     this->save_dir = paths[1];
     this->output_name =  std::regex_replace(this->output_name, std::regex(R"(.)"), "");
     this->output_name =  std::regex_replace(this->output_name, std::regex(R"(mp4)"), ".mp4");
+    // this->desktop_dir = ;
 }
 
 void Vimeo::merge() {
