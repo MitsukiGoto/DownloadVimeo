@@ -1,5 +1,6 @@
 ![CMake-Linux](https://github.com/MitsukiGoto/DownloadVimeo/workflows/CMake-Linux/badge.svg)
 ![CMake-macOS](https://github.com/MitsukiGoto/DownloadVimeo/workflows/CMake-macOS/badge.svg)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/MitsukiGoto/DownloadVimeo.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MitsukiGoto/DownloadVimeo/context:cpp)
 ### Thanks to
 https://github.com/tplgy/cppcodec \
 https://github.com/eMBee/vimeo-download
