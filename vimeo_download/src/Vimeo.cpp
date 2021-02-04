@@ -39,13 +39,18 @@ Vimeo::Vimeo(const std::string& output_name, const std::string& url, std::unique
     auto paths = createDirectory();
     this->tmp_dir = paths[0];
     this->save_dir = paths[1];
-    this->output_name =  std::regex_replace(this->output_name, std::regex(R"(.)"), "");
-    this->output_name =  std::regex_replace(this->output_name, std::regex(R"(mp4)"), ".mp4");
+    std::cout << output_name << std::endl;
+    if(this->output_name.find(".mp4") == std::string::npos) {
+        if(this->isVerbose) {
+            std::cout << "cannot find .mp4 with name" << std::endl;
+        }
+        this->output_name+=".mp4";
+    }
 }
 
 template<typename T, typename U>
 auto Vimeo::command(T tmp, U name) {
-    auto command = "ffmpeg -i " + tmp + "a.mp3 " + "-i " + tmp + "v.mp4" + " -acodec" + " copy" + " -vcodec" + " copy " + this->home_dir + "/Desktop/Vimeo/aaa.mp4" + name;
+    auto command = "ffmpeg -i " + tmp + "a.mp3 " + "-i " + tmp + "v.mp4" + " -acodec" + " copy" + " -vcodec" + " copy " + this->home_dir + "/Desktop/Vimeo/" + name;
     return command;
 }
 
