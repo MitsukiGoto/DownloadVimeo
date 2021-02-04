@@ -30,8 +30,11 @@ private:
     std::string base_url;
     std::string tmp_dir;
     std::string save_dir;
+    std::string home_dir;
     std::string output_name;
     bool isVerbose;
+    template<typename T, typename U>
+    auto command(T tmp, U name);
 };
 
 #endif /* VimeoParse_hpp */
