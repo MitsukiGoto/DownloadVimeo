@@ -37,7 +37,7 @@ std::unique_ptr<JSON> Requests::get(const std::string& url) {
     std::exit(1);
 }
 
-void Requests::get(const std::string& url, const std::string& path) {
+void Requests::get(std::string& url, const std::string& path) {
     long status_code = 0;
     std::ofstream output(path, std::ios::binary|std::ios::app);
     CURL* curl;

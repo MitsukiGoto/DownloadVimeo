@@ -21,30 +21,37 @@
 #include <iterator>
 
 namespace {
+auto home_dir = std::string(std::getenv("HOME"));
 auto decode = [](std::string encodedStr){
     return cppcodec::base64_rfc4648::decode(encodedStr);
 };
 
 template<typename T, typename U>
 constexpr auto command(T tmp, U name) {
-    auto command = "ffmpeg -i " + tmp + "a.mp3 " + "-i " + tmp + "v.mp4" + " -acodec" + " copy" + " -vcodec" + " copy" + " /Users/mitsukigoto/Desktop/Vimeo/" + name;
+    auto command = "ffmpeg -i " + tmp + "a.mp3 " + "-i " + tmp + "v.mp4" + " -acodec" + " copy" + " -vcodec" + " copy" + home_dir + " /Desktop/Vimeo/aaa.mp4" + name;
     return command;
+}
+std::string remove_str(std::string from, std::string regex) {
+    return std::regex_replace(from, std::regex(regex), "");;
 }
 }
 
 Vimeo::Vimeo(const std::string& output_name, const std::string& url, std::unique_ptr<JSON> json, bool isVerbose) : url(url) ,output_name(output_name), isVerbose(isVerbose) {
     this->json = std::move(json);
-    this->base_url = std::regex_replace(url, std::regex(R"(sep/.+)"), "");
+    this->base_url = std::regex_replace(url, std::regex(R"(master.json?.+?base64_init=1)"), "");
+    std::cout << "here" << this->base_url << std::endl;
+    this->base_url = url;
+    std::cout << base_url << std::endl;
     auto paths = createDirectory();
     this->tmp_dir = paths[0];
     this->save_dir = paths[1];
     this->output_name =  std::regex_replace(this->output_name, std::regex(R"(.)"), "");
     this->output_name =  std::regex_replace(this->output_name, std::regex(R"(mp4)"), ".mp4");
-    // this->desktop_dir = ;
+    std::cout << this->output_name << std::endl;
 }
 
 void Vimeo::merge() {
-#ifdef __APPLE__
+#ifdef __MACH__
     auto command_ = command(this->tmp_dir, this->output_name);
     if(!this->isVerbose) {
         command_ += " >/dev/null 2>&1";
@@ -53,7 +60,7 @@ void Vimeo::merge() {
     }
     std::system(command_.c_str());
     std::cout << "\u001b[35m" << "Merging Audio and Video has successflly done" << std::endl;
-    std::cout << "The Video was saved as:" << " /Users/mitsukigoto/Desktop/Vimeo/" << this->output_name << std::endl;
+    std::cout << "The Video was saved as:" << this->home_dir << " Desktop/Vimeo/" << this->output_name << std::endl;
     std::filesystem::remove_all(this->tmp_dir);
     std::cout << "Cleaning Process Started" << std::endl;
     std::cout << "\u001b[31m" << "Temp Folder has removed: " << this->tmp_dir << std::endl;
@@ -65,7 +72,7 @@ void Vimeo::merge() {
 }
 
 Vimeo& Vimeo::download() {
-#ifdef APPLE
+#ifdef __MACH__
     auto process1 = std::thread([this]{this->downloadVideo();});
     auto process2 = std::thread([this]{this->downloadAudio();});
     process1.join();
@@ -85,7 +92,7 @@ std::array<std::string, 2> Vimeo::createDirectory() {
     std::string tmp = std::filesystem::temp_directory_path().string()+"dlvimeo/"+ss.str()+"/";
     std::filesystem::create_directories(tmp);
     paths[0] = tmp;
-    std::string saved = std::string(std::getenv("HOME"))+"/Desktop/Vimeo";
+    std::string saved = this->home_dir+"/Desktop/Vimeo";
     std::filesystem::create_directories(saved);
     paths[1] = saved;
     return paths;
@@ -104,7 +111,7 @@ void Vimeo::downloadVideo() {
     }
     std::sort(std::begin(heights), std::end(heights), std::greater<std::tuple<int, int>>());
     picojson::object highest_video = video[std::get<1>(heights[0])].get<picojson::object>();
-    std::string video_base_url = this->base_url + "sep/video/" + highest_video.at("base_url").to_str();
+    std::string video_base_url = remove_str(url, "master.json?.+?base64_init=1") + highest_video.at("base_url").to_str();
     if(this->isVerbose) {
         std::cout << "video_base_url: " << video_base_url <<  std::endl;
     }
@@ -126,8 +133,9 @@ void Vimeo::downloadVideo() {
 
 void Vimeo::downloadAudio() {
     auto audio = json->v.get<picojson::object>()["audio"].get<picojson::array>()[0].get<picojson::object>();
-    std::string audio_base_url = this->base_url + "sep/audio/" + audio.at("base_url").to_str().erase(0, 9);
+    std::string audio_base_url = remove_str(remove_str(url, "master.json?.+?base64_init=1"), "sep/.+") + "sep/audio/" + remove_str(audio.at("base_url").to_str(), "../../audio");
     if(this->isVerbose){
+        std::cout << audio.at("base_url") << std::endl;
         std::cout << "audio_base_url: " << audio_base_url <<  std::endl;
     }
     auto decoded = decode(audio.at("init_segment").to_str());
