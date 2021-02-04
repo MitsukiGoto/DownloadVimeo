@@ -1,5 +1,6 @@
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
+project.pbxproj
 !*.xcworkspace/contents.xcworkspacedata
 .vscode/
 build/
