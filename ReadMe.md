@@ -36,7 +36,9 @@ cd build
 cmake ../vimeo_download
 cmake --build ./
 ```
-**For  Other Linux Windows Users** \
+**For Ubuntu on WSL2 Users** \
+Follow the instructions given above.
+**For Other Linux or Pure Windows Users** \
 Sorry, this project is not supporting these platforms now. \
 But this is going to come soon!!!!
 ### Usage
