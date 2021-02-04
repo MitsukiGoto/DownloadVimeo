@@ -92,7 +92,7 @@ std::array<std::string, 2> Vimeo::createDirectory() {
     std::array<std::string, 2> paths;
     auto now_c = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::stringstream ss;
-    ss << std::put_time(localtime(&now_c), "%Y%m%d_%H%M%S");
+    ss << now_c;
     std::string tmp = std::filesystem::temp_directory_path().string()+"/dlvimeo/"+ss.str()+"/";
     std::filesystem::create_directories(tmp);
     paths[0] = tmp;
