@@ -55,7 +55,7 @@ auto Vimeo::command(T tmp, U name) {
 }
 
 void Vimeo::merge() {
-#ifdef __MACH__
+#if defined(__MACH__) || defined(__linux)
     auto command_ = command(this->tmp_dir, this->output_name);
     if(!this->isVerbose) {
         command_ += " >/dev/null 2>&1";
@@ -70,7 +70,7 @@ void Vimeo::merge() {
     std::cout << "\u001b[31m" << "Temp Folder has removed: " << this->tmp_dir << std::endl;
     std::cout << "Cleaning Process End" << "\u001b[0m" << std::endl;
 #endif
-#ifdef __CYGWIN__
+#ifdef __WIN64
     std::cout << "Sorry, Merging Audio and Video doesn't support on Windows now" << std::endl;
 #endif
 }
@@ -93,7 +93,7 @@ std::array<std::string, 2> Vimeo::createDirectory() {
     auto now_c = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::stringstream ss;
     ss << std::put_time(localtime(&now_c), "%Y%m%d_%H%M%S");
-    std::string tmp = std::filesystem::temp_directory_path().string()+"dlvimeo/"+ss.str()+"/";
+    std::string tmp = std::filesystem::temp_directory_path().string()+"/dlvimeo/"+ss.str()+"/";
     std::filesystem::create_directories(tmp);
     paths[0] = tmp;
     std::string saved = this->home_dir+"/Desktop/Vimeo";
