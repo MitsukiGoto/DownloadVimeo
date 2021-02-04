@@ -16,11 +16,27 @@ brew install boost
 ``` 
 2.  Run the following command to build.
 ```
+mkdir build
 cd build
 cmake ../vimeo_download
 cmake --build ./
 ```
-**For Linux Windows Users** \
+**For Ubuntu Users** \
+1. If your PC is not installed required library, please run the following command.
+```
+sudo apt install libboost-dev
+sudo apt install libboost-all-dev
+sudo apt install libcurl4-openssl-dev
+sudo apt install ffmpeg
+``` 
+2.  Run the following command to build.
+```
+mkdir build
+cd build
+cmake ../vimeo_download
+cmake --build ./
+```
+**For  Other Linux Windows Users** \
 Sorry, this project is not supporting these platforms now. \
 But this is going to come soon!!!!
 ### Usage
