@@ -21,33 +21,32 @@
 #include <iterator>
 
 namespace {
-auto home_dir = std::string(std::getenv("HOME"));
 auto decode = [](std::string encodedStr){
     return cppcodec::base64_rfc4648::decode(encodedStr);
 };
-
-template<typename T, typename U>
-constexpr auto command(T tmp, U name) {
-    auto command = "ffmpeg -i " + tmp + "a.mp3 " + "-i " + tmp + "v.mp4" + " -acodec" + " copy" + " -vcodec" + " copy" + home_dir + " /Desktop/Vimeo/aaa.mp4" + name;
-    return command;
-}
 std::string remove_str(std::string from, std::string regex) {
     return std::regex_replace(from, std::regex(regex), "");;
 }
+
 }
 
 Vimeo::Vimeo(const std::string& output_name, const std::string& url, std::unique_ptr<JSON> json, bool isVerbose) : url(url) ,output_name(output_name), isVerbose(isVerbose) {
     this->json = std::move(json);
     this->base_url = std::regex_replace(url, std::regex(R"(master.json?.+?base64_init=1)"), "");
-    std::cout << "here" << this->base_url << std::endl;
     this->base_url = url;
+    this->home_dir = std::string(std::getenv("HOME"));
     std::cout << base_url << std::endl;
     auto paths = createDirectory();
     this->tmp_dir = paths[0];
     this->save_dir = paths[1];
     this->output_name =  std::regex_replace(this->output_name, std::regex(R"(.)"), "");
     this->output_name =  std::regex_replace(this->output_name, std::regex(R"(mp4)"), ".mp4");
-    std::cout << this->output_name << std::endl;
+}
+
+template<typename T, typename U>
+auto Vimeo::command(T tmp, U name) {
+    auto command = "ffmpeg -i " + tmp + "a.mp3 " + "-i " + tmp + "v.mp4" + " -acodec" + " copy" + " -vcodec" + " copy " + this->home_dir + "/Desktop/Vimeo/aaa.mp4" + name;
+    return command;
 }
 
 void Vimeo::merge() {
@@ -60,7 +59,7 @@ void Vimeo::merge() {
     }
     std::system(command_.c_str());
     std::cout << "\u001b[35m" << "Merging Audio and Video has successflly done" << std::endl;
-    std::cout << "The Video was saved as:" << this->home_dir << " Desktop/Vimeo/" << this->output_name << std::endl;
+    std::cout << "The Video was saved to:" << this->home_dir << "/Desktop/Vimeo/" << this->output_name << std::endl;
     std::filesystem::remove_all(this->tmp_dir);
     std::cout << "Cleaning Process Started" << std::endl;
     std::cout << "\u001b[31m" << "Temp Folder has removed: " << this->tmp_dir << std::endl;

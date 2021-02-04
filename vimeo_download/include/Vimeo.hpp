@@ -33,6 +33,8 @@ private:
     std::string home_dir;
     std::string output_name;
     bool isVerbose;
+    template<typename T, typename U>
+    auto command(T tmp, U name);
 };
 
 #endif /* VimeoParse_hpp */
