@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //
 //  Requests.hpp
 //  vimeo_download
