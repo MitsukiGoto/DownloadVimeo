@@ -1,4 +1,5 @@
-![CMake](https://github.com/MitsukiGoto/DownloadVimeo/workflows/CMake/badge.svg)
+![CMake-Linux](https://github.com/MitsukiGoto/DownloadVimeo/workflows/CMake-Linux/badge.svg)
+![CMake-macOS](https://github.com/MitsukiGoto/DownloadVimeo/workflows/CMake-macOS/badge.svg)
 ### Thanks to
 https://github.com/tplgy/cppcodec \
 https://github.com/eMBee/vimeo-download
