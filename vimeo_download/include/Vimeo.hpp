@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 //
 //  VimeoParse.hpp
 //  vimeo_download
