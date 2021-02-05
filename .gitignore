@@ -1,13 +1,6 @@
-<<<<<<< HEAD
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
+project.pbxproj
 !*.xcworkspace/contents.xcworkspacedata
 .vscode/
 build/
-=======
-*.xcodeproj/*
-!*.xcodeproj/project.pbxproj
-!*.xcworkspace/contents.xcworkspacedata
-.vscode/
-DownloadVimeo/build/
->>>>>>> master
