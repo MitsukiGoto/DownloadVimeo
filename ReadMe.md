@@ -23,7 +23,7 @@ cd build
 cmake ../vimeo_download
 cmake --build ./
 ```
-**For Ubuntu Users** \
+**For Ubuntu Users**
 1. If your PC is not installed required library, please run the following command.
 ```
 sudo apt install libboost-dev
@@ -39,7 +39,7 @@ cmake ../vimeo_download
 cmake --build ./
 ```
 **For Ubuntu on WSL2 Users** \
-Follow the instructions given above.
+Follow the instructions given above. \
 **For Other Linux or Pure Windows Users** \
 Sorry, this project is not supporting these platforms now. \
 But this is going to come soon!!!!
