@@ -55,5 +55,5 @@ To get this url:
 
 After you get that url, run the commmand 
 ```
-vimeo_download --url [that url] --output [video's name]
+./vimeo_download --url [that url] --output [video's name]
 ```
