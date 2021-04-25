@@ -63,6 +63,7 @@ void Requests::get(std::string &url, const std::string &path)
         return;
     }
     std::cout << "ERROR: HTTP Status Code is " << status_code << std::endl;
+    std::cout << url << std::endl;
     curl = nullptr;
     std::exit(1);
 }

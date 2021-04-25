@@ -30,6 +30,24 @@ namespace
         return std::regex_replace(from, std::regex(regex), "");
         ;
     }
+    std::vector<std::string> split(std::string str, std::string split_str)
+    {
+        if (split_str == "")
+            return {str};
+        std::vector<std::string> result;
+        std::string tstr = str + split_str;
+        long l = tstr.length(), sl = split_str.length();
+        std::string::size_type pos = 0, prev = 0;
+
+        for (; pos < l && (pos = tstr.find(split_str, pos)) != std::string::npos; prev = (pos += sl))
+        {
+            result.emplace_back(tstr, prev, pos - prev);
+        }
+        return result;
+    }
+    auto urljoin(std::string base_url, std::string relative)
+    {
+    }
 
 } // namespace
 
@@ -89,10 +107,12 @@ void Vimeo::merge()
 #endif
 }
 
-Vimeo& Vimeo::download() {
-#if defined(__MACH__) || defined(__linux)
-    auto process1 = std::thread([this]{this->downloadVideo();});
-    auto process2 = std::thread([this]{this->downloadAudio();});
+Vimeo &Vimeo::download()
+{
+// #if defined(__MACH__) || defined(__linux)
+#ifdef DEBUGING
+    auto process1 = std::thread([this] { this->downloadVideo(); });
+    auto process2 = std::thread([this] { this->downloadAudio(); });
     process1.join();
     process2.join();
 #else
@@ -145,6 +165,7 @@ void Vimeo::downloadVideo()
     ofs.close();
     for (auto &segment : highest_video.at("segments").get<picojson::array>())
     {
+        std::cout << segment.get<picojson::object>()["url"].to_str() << std::endl;
         std::string segment_url = video_base_url + segment.get<picojson::object>()["url"].to_str();
         Requests::get(segment_url, this->tmp_dir + "v.mp4");
     }

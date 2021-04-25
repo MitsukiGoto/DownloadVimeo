@@ -4,3 +4,5 @@ project.pbxproj
 !*.xcworkspace/contents.xcworkspacedata
 .vscode/
 build/
+test.dSYM/
+test/test
