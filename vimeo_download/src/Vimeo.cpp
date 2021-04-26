@@ -25,18 +25,17 @@ namespace
     auto decode = [](std::string encodedStr) {
         return cppcodec::base64_rfc4648::decode(encodedStr);
     };
-    std::string remove_str(std::string from, std::string regex)
+    template <typename T>
+    void print(T t)
     {
-        return std::regex_replace(from, std::regex(regex), "");
-        ;
+        std::cout << t << std::endl;
     }
-    std::vector<std::string> split(std::string str, std::string split_str)
+    std::vector<std::string> splitBySlash(std::string str)
     {
-        if (split_str == "")
-            return {str};
+        const std::string split_str = "/";
         std::vector<std::string> result;
         std::string tstr = str + split_str;
-        long l = tstr.length(), sl = split_str.length();
+        unsigned long l = tstr.length(), sl = split_str.length();
         std::string::size_type pos = 0, prev = 0;
 
         for (; pos < l && (pos = tstr.find(split_str, pos)) != std::string::npos; prev = (pos += sl))
@@ -45,8 +44,36 @@ namespace
         }
         return result;
     }
-    auto urljoin(std::string base_url, std::string relative)
+
+    auto vecToString(const std::vector<std::string> &vec)
     {
+        std::string str;
+        for (const auto &elm : vec)
+        {
+            if (str != "")
+            {
+                str = str + "/" + elm;
+            }
+            else
+            {
+                str = elm;
+            }
+        }
+        return str += "/";
+    }
+
+    auto getBaseUrl(std::string base_url, std::string relative)
+    {
+        auto splitted = splitBySlash(base_url);
+        splitted.erase(splitted.end() - 1);
+        for (auto &content : splitBySlash(relative))
+        {
+            if (content == "..")
+            {
+                splitted.erase(splitted.end() - 1);
+            }
+        }
+        return vecToString(splitted);
     }
 
 } // namespace
@@ -54,8 +81,7 @@ namespace
 Vimeo::Vimeo(const std::string &output_name, const std::string &url, std::unique_ptr<JSON> json, bool isVerbose) : url(url), output_name(output_name), isVerbose(isVerbose)
 {
     this->json = std::move(json);
-    this->base_url = std::regex_replace(url, std::regex(R"(master.json?.+?base64_init=1)"), "");
-    this->base_url = url;
+    this->base_url = getBaseUrl(url, this->json->v.get<picojson::object>()["base_url"].to_str());
     this->home_dir = std::string(std::getenv("HOME"));
     std::cout << base_url << std::endl;
     auto paths = createDirectory();
@@ -109,8 +135,8 @@ void Vimeo::merge()
 
 Vimeo &Vimeo::download()
 {
-// #if defined(__MACH__) || defined(__linux)
-#ifdef DEBUGING
+#if defined(__MACH__) || defined(__linux)
+// #ifdef DEBUGING
     auto process1 = std::thread([this] { this->downloadVideo(); });
     auto process2 = std::thread([this] { this->downloadAudio(); });
     process1.join();
@@ -152,7 +178,7 @@ void Vimeo::downloadVideo()
     }
     std::sort(std::begin(heights), std::end(heights), std::greater<std::tuple<int, int>>());
     picojson::object highest_video = video[std::get<1>(heights[0])].get<picojson::object>();
-    std::string video_base_url = remove_str(url, "master.json?.+?base64_init=1") + highest_video.at("base_url").to_str();
+    std::string video_base_url = this->base_url + highest_video.at("base_url").to_str();
     if (this->isVerbose)
     {
         std::cout << "video_base_url: " << video_base_url << std::endl;
@@ -165,7 +191,6 @@ void Vimeo::downloadVideo()
     ofs.close();
     for (auto &segment : highest_video.at("segments").get<picojson::array>())
     {
-        std::cout << segment.get<picojson::object>()["url"].to_str() << std::endl;
         std::string segment_url = video_base_url + segment.get<picojson::object>()["url"].to_str();
         Requests::get(segment_url, this->tmp_dir + "v.mp4");
     }
@@ -181,7 +206,7 @@ void Vimeo::downloadVideo()
 void Vimeo::downloadAudio()
 {
     auto audio = json->v.get<picojson::object>()["audio"].get<picojson::array>()[0].get<picojson::object>();
-    std::string audio_base_url = remove_str(remove_str(url, "master.json?.+?base64_init=1"), "sep/.+") + "sep/audio/" + remove_str(audio.at("base_url").to_str(), "../../audio");
+    std::string audio_base_url = this->base_url + audio.at("base_url").to_str();
     if (this->isVerbose)
     {
         std::cout << audio.at("base_url") << std::endl;

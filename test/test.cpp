@@ -3,11 +3,17 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <regex>
 
-std::vector<std::string> split(std::string str, std::string split_str)
+template <typename T>
+void print(T t)
 {
-    if (split_str == "")
-        return {str};
+    std::cout << t << std::endl;
+}
+
+std::vector<std::string> splitBySlash(std::string str)
+{
+    const std::string split_str = "/";
     std::vector<std::string> result;
     std::string tstr = str + split_str;
     long l = tstr.length(), sl = split_str.length();
@@ -20,11 +26,37 @@ std::vector<std::string> split(std::string str, std::string split_str)
     return result;
 }
 
+auto vecToString(const std::vector<std::string> &vec)
+{
+    std::string str;
+    for (const auto &elm : vec)
+    {
+        if (str != "")
+        {
+            str = str + "/" + elm;
+        } else {
+            str = elm;
+        }
+    }
+    return str+="/";
+}
+
+auto getBaseUrl(std::string base_url, std::string relative)
+{
+    auto splitted = splitBySlash(base_url);
+    splitted.erase(splitted.end() - 1);
+    for (auto &content : splitBySlash(relative))
+    {
+        if (content == "..")
+        {
+            splitted.erase(splitted.end() - 1);
+        }
+    }
+    return vecToString(splitted);
+}
+
 int main()
 {
-    auto vec = split("https://135vod-adaptive.akamaized.net/exp=1619304805~acl=%2F2399b639-f634-4619-8617-b8104ebc4476%2F%2A~hmac=463dcebe095526a361192018b9f765d57aec0b33257a23422d6f85e0a242e200/2399b639-f634-4619-8617-b8104ebc4476/sep/video/93604f68,0981b75b,f3ece05a/audio/3a7faaae,5b71e844/master.json?query_string_ranges=1&base64_init=1","/");
-    for(auto v:vec) {
-        std::cout << v << std::endl;
-    }
+    print(getBaseUrl("https://135vod-adaptive.akamaized.net/exp=1619426953~acl=%2F2399b639-f634-4619-8617-b8104ebc4476%2F%2A~hmac=246cada37c386de2082e26a3778af986cf3cbf3c47de166c0a417e6b665ccd91/2399b639-f634-4619-8617-b8104ebc4476/sep/video/93604f68,0981b75b,f3ece05a/audio/5b71e844,3a7faaae/master.json?query_string_ranges=1&base64_init=1", "../../../"));
     return 0;
 }
