@@ -12,20 +12,21 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <array>
 #include "JSON.hpp"
 
-class Vimeo {
+class Vimeo
+{
 public:
-    Vimeo(const std::string&, const std::string&, std::unique_ptr<JSON>, bool verbose);
+    Vimeo(const std::string &, const std::string &, std::unique_ptr<JSON>, bool verbose);
     Vimeo() = delete;
-    Vimeo& download();
+    Vimeo &download();
     void merge();
+
 private:
     void downloadVideo();
     void downloadAudio();
     void downloadSegmentAndMerge(picojson::object obj, std::string tmpDir, std::string tmpFileName);
-    std::array<std::string, 2> createDirectory();
+    std::tuple<std::string, std::string> createDirectory();
     std::unique_ptr<JSON> json;
     std::string url;
     std::string base_url;
@@ -34,7 +35,7 @@ private:
     std::string home_dir;
     std::string output_name;
     bool isVerbose;
-    template<typename T, typename U>
+    template <typename T, typename U>
     auto command(T tmp, U name);
 };
 

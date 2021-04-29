@@ -28,8 +28,8 @@ Vimeo::Vimeo(const std::string &output_name, const std::string &url, std::unique
     this->home_dir = std::string(std::getenv("HOME"));
     std::cout << base_url << std::endl;
     auto paths = createDirectory();
-    this->tmp_dir = paths[0];
-    this->save_dir = paths[1];
+    this->tmp_dir = std::get<0>(paths);
+    this->save_dir = std::get<1>(paths);
     std::cout << output_name << std::endl;
     if (this->output_name.find(".mp4") == std::string::npos)
     {
@@ -91,18 +91,15 @@ Vimeo &Vimeo::download()
     return *this;
 }
 
-std::array<std::string, 2> Vimeo::createDirectory()
-{
-    std::array<std::string, 2> paths;
+std::tuple<std::string, std::string> Vimeo::createDirectory() {
     auto now_c = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::stringstream ss;
     ss << now_c;
     std::string tmp = std::filesystem::temp_directory_path().string() + "/dlvimeo/" + ss.str() + "/";
     std::filesystem::create_directories(tmp);
-    paths[0] = tmp;
     std::string saved = this->home_dir + "/Desktop/Vimeo";
     std::filesystem::create_directories(saved);
-    paths[1] = saved;
+    std::tuple<std::string, std::string> paths = {tmp, saved};
     return paths;
 }
 
