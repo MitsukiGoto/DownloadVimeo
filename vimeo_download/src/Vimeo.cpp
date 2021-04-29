@@ -9,6 +9,7 @@
 #include "Vimeo.hpp"
 #include "Requests.hpp"
 #include "../include/cppcodec/base64_rfc4648.hpp"
+#include "../include/Utils.hpp"
 #include <regex>
 #include <tuple>
 #include <filesystem>
@@ -20,68 +21,10 @@
 #include <sstream>
 #include <iterator>
 
-namespace
-{
-    auto decode = [](std::string encodedStr) {
-        return cppcodec::base64_rfc4648::decode(encodedStr);
-    };
-    template <typename T>
-    void print(T t)
-    {
-        std::cout << t << std::endl;
-    }
-    std::vector<std::string> splitBySlash(std::string str)
-    {
-        const std::string split_str = "/";
-        std::vector<std::string> result;
-        std::string tstr = str + split_str;
-        unsigned long l = tstr.length(), sl = split_str.length();
-        std::string::size_type pos = 0, prev = 0;
-
-        for (; pos < l && (pos = tstr.find(split_str, pos)) != std::string::npos; prev = (pos += sl))
-        {
-            result.emplace_back(tstr, prev, pos - prev);
-        }
-        return result;
-    }
-
-    auto vecToString(const std::vector<std::string> &vec)
-    {
-        std::string str;
-        for (const auto &elm : vec)
-        {
-            if (str != "")
-            {
-                str = str + "/" + elm;
-            }
-            else
-            {
-                str = elm;
-            }
-        }
-        return str += "/";
-    }
-
-    auto getBaseUrl(std::string base_url, std::string relative)
-    {
-        auto splitted = splitBySlash(base_url);
-        splitted.erase(splitted.end() - 1);
-        for (auto &content : splitBySlash(relative))
-        {
-            if (content == "..")
-            {
-                splitted.erase(splitted.end() - 1);
-            }
-        }
-        return vecToString(splitted);
-    }
-
-} // namespace
-
 Vimeo::Vimeo(const std::string &output_name, const std::string &url, std::unique_ptr<JSON> json, bool isVerbose) : url(url), output_name(output_name), isVerbose(isVerbose)
 {
     this->json = std::move(json);
-    this->base_url = getBaseUrl(url, this->json->v.get<picojson::object>()["base_url"].to_str());
+    this->base_url = Utils::getBaseUrl(url, this->json->v.get<picojson::object>()["base_url"].to_str());
     this->home_dir = std::string(std::getenv("HOME"));
     std::cout << base_url << std::endl;
     auto paths = createDirectory();
@@ -136,7 +79,7 @@ void Vimeo::merge()
 Vimeo &Vimeo::download()
 {
 #if defined(__MACH__) || defined(__linux)
-// #ifdef DEBUGING
+    // #ifdef DEBUGING
     auto process1 = std::thread([this] { this->downloadVideo(); });
     auto process2 = std::thread([this] { this->downloadAudio(); });
     process1.join();
@@ -183,7 +126,7 @@ void Vimeo::downloadVideo()
     {
         std::cout << "video_base_url: " << video_base_url << std::endl;
     }
-    auto decoded = decode(highest_video.at("init_segment").to_str());
+    auto decoded = Utils::decode(highest_video.at("init_segment").to_str());
     std::ofstream ofs(this->tmp_dir + "v.mp4", std::ios::out | std::ios::binary);
     std::stringstream s;
     std::move(decoded.begin(), decoded.end(), std::ostream_iterator<unsigned char>(s));
@@ -212,7 +155,7 @@ void Vimeo::downloadAudio()
         std::cout << audio.at("base_url") << std::endl;
         std::cout << "audio_base_url: " << audio_base_url << std::endl;
     }
-    auto decoded = decode(audio.at("init_segment").to_str());
+    auto decoded = Utils::decode(audio.at("init_segment").to_str());
     std::ofstream ofs(this->tmp_dir + "a.mp3", std::ios::out | std::ios::binary);
     std::stringstream s;
     std::move(decoded.begin(), decoded.end(), std::ostream_iterator<unsigned char>(s));
@@ -231,3 +174,12 @@ void Vimeo::downloadAudio()
         std::cout << "Only Audio at: " << this->tmp_dir + "v.mp4" << std::endl;
     }
 }
+
+// void Vimeo::downloadSegmentAndMerge(picojson::object obj, std::string mode)
+// {
+//     for (auto &segment : obj.at("segments").get<picojson::array>())
+//     {
+//         std::string segment_url = video_base_url + segment.get<picojson::object>()["url"].to_str();
+//         Requests::get(segment_url, this->tmp_dir + tmpFileName);
+//     }
+// }

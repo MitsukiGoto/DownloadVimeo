@@ -24,6 +24,7 @@ public:
 private:
     void downloadVideo();
     void downloadAudio();
+    void downloadSegmentAndMerge(picojson::object obj, std::string tmpDir, std::string tmpFileName);
     std::array<std::string, 2> createDirectory();
     std::unique_ptr<JSON> json;
     std::string url;
