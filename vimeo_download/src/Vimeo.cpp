@@ -123,17 +123,7 @@ void Vimeo::downloadVideo()
     {
         std::cout << "video_base_url: " << video_base_url << std::endl;
     }
-    auto decoded = Utils::decode(highest_video.at("init_segment").to_str());
-    std::ofstream ofs(this->tmp_dir + "v.mp4", std::ios::out | std::ios::binary);
-    std::stringstream s;
-    std::move(decoded.begin(), decoded.end(), std::ostream_iterator<unsigned char>(s));
-    ofs << s.rdbuf();
-    ofs.close();
-    for (auto &segment : highest_video.at("segments").get<picojson::array>())
-    {
-        std::string segment_url = video_base_url + segment.get<picojson::object>()["url"].to_str();
-        Requests::get(segment_url, this->tmp_dir + "v.mp4");
-    }
+    downloadSegmentAndMerge(highest_video, video_base_url, "video");
     std::cout << "\u001b[36m"
               << "Downloading Video has successflly done"
               << "\u001b[0m" << std::endl;
@@ -152,17 +142,7 @@ void Vimeo::downloadAudio()
         std::cout << audio.at("base_url") << std::endl;
         std::cout << "audio_base_url: " << audio_base_url << std::endl;
     }
-    auto decoded = Utils::decode(audio.at("init_segment").to_str());
-    std::ofstream ofs(this->tmp_dir + "a.mp3", std::ios::out | std::ios::binary);
-    std::stringstream s;
-    std::move(decoded.begin(), decoded.end(), std::ostream_iterator<unsigned char>(s));
-    ofs << s.rdbuf();
-    ofs.close();
-    for (auto &segment : audio.at("segments").get<picojson::array>())
-    {
-        std::string segment_url = audio_base_url + segment.get<picojson::object>()["url"].to_str();
-        Requests::get(segment_url, this->tmp_dir + "a.mp3");
-    }
+    downloadSegmentAndMerge(audio, audio_base_url, "audio");
     std::cout << "\u001b[32m"
               << "Downloading Audio has successflly done"
               << "\u001b[0m" << std::endl;
@@ -172,11 +152,30 @@ void Vimeo::downloadAudio()
     }
 }
 
-// void Vimeo::downloadSegmentAndMerge(picojson::object obj, std::string mode)
-// {
-//     for (auto &segment : obj.at("segments").get<picojson::array>())
-//     {
-//         std::string segment_url = video_base_url + segment.get<picojson::object>()["url"].to_str();
-//         Requests::get(segment_url, this->tmp_dir + tmpFileName);
-//     }
-// }
+void Vimeo::downloadSegmentAndMerge(picojson::object& obj, std::string base_url, std::string mode)
+{
+    std::string tmpFileDir;
+    if(mode == "video") {
+        tmpFileDir = this->tmp_dir + "v.mp4";
+    } else if (mode=="audio"){
+        tmpFileDir = this->tmp_dir + "a.mp3";
+    } else {
+        std::cerr << "Unknown mode argument were given.";
+        std::exit(1);
+    }
+    decodeInitSegmentAndMerge(obj, tmpFileDir);
+    for (auto &segment : obj.at("segments").get<picojson::array>())
+    {
+        std::string segment_url = base_url + segment.get<picojson::object>()["url"].to_str();
+        Requests::get(segment_url, tmpFileDir);
+    }
+}
+
+void Vimeo::decodeInitSegmentAndMerge(const picojson::object& obj, std::string tmpFileDir) {
+    std::ofstream ofs(tmpFileDir, std::ios::out | std::ios::binary);
+    std::stringstream s;
+    auto decoded = Utils::decode(obj.at("init_segment").to_str());
+    std::move(decoded.begin(), decoded.end(), std::ostream_iterator<unsigned char>(s));
+    ofs << s.rdbuf();
+    ofs.close();
+}
