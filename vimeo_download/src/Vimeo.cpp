@@ -105,19 +105,7 @@ std::tuple<std::string, std::string> Vimeo::createDirectory() {
 
 void Vimeo::downloadVideo()
 {
-    auto video = json->v.get<picojson::object>()["video"].get<picojson::array>();
-    int i = 0;
-    // The most high quality video has most largest "height" value
-    std::vector<std::tuple<int, int>> heights;
-    for (auto &content : video)
-    {
-        std::string height = content.get<picojson::object>()["height"].to_str();
-        std::tuple<int, int> t = {std::stoi(height), i};
-        heights.push_back(t);
-        i++;
-    }
-    std::sort(std::begin(heights), std::end(heights), std::greater<std::tuple<int, int>>());
-    picojson::object highest_video = video[std::get<1>(heights[0])].get<picojson::object>();
+    picojson::object highest_video = getHighestQualityVideoPartOfJson();
     std::string video_base_url = this->base_url + highest_video.at("base_url").to_str();
     if (this->isVerbose)
     {
@@ -150,6 +138,22 @@ void Vimeo::downloadAudio()
     {
         std::cout << "Only Audio at: " << this->tmp_dir + "v.mp4" << std::endl;
     }
+}
+
+picojson::object Vimeo::getHighestQualityVideoPartOfJson() {
+    auto video = json->v.get<picojson::object>()["video"].get<picojson::array>();
+    int i = 0;
+    // The most high quality video has most largest "height" value
+    std::vector<std::tuple<int, int>> heights;
+    for (auto &content : video)
+    {
+        std::string height = content.get<picojson::object>()["height"].to_str();
+        std::tuple<int, int> t = {std::stoi(height), i};
+        heights.push_back(t);
+        i++;
+    }
+    std::sort(std::begin(heights), std::end(heights), std::greater<std::tuple<int, int>>());
+    return video[std::get<1>(heights[0])].get<picojson::object>();
 }
 
 void Vimeo::downloadSegmentAndMerge(picojson::object& obj, std::string base_url, std::string mode)
