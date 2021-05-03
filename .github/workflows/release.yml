@@ -42,7 +42,7 @@ jobs:
     - name: zipping
       working-directory: ${{github.workspace}}/build
       shell: bash
-      run: zip ${{github.workspace}}/build/download_vimeo.zip ${{github.workspace}}/build/download_vimeo
+      run: zip ${{github.workspace}}/vimeo_download/download_vimeo.zip ${{github.workspace}}/vimeo_download/download_vimeo
     
     - name: Create Release
       uses: actions/create-release@v1
