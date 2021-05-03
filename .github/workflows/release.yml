@@ -39,6 +39,7 @@ jobs:
 
   release:
     name: push release
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: zipping
