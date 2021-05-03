@@ -37,7 +37,7 @@ jobs:
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: |
        cmake --build ../vimeo_download --config $BUILD_TYPE
-       cd ../
+       cd ../build
        ls -la
 
     - name: zipping
