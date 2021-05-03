@@ -35,14 +35,16 @@ jobs:
       working-directory: ${{github.workspace}}/build
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build ../vimeo_download --config $BUILD_TYPE
+      run:
+       cmake --build ../vimeo_download  --prefix ${{github.workspace}}/build --config $BUILD_TYPE
 
     - name: zipping
       working-directory: ${{github.workspace}}/build
       shell: bash
-      run: zip download_vimeo.zip ./download_vimeo
+      run: zip ${{github.workspace}}/vimeo_download/download_vimeo.zip ${{github.workspace}}/vimeo_download/download_vimeo
     
     - name: Create Release
+      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,6 +60,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{github.workspace}}/build/download_vimeo.zip
+        asset_path: ${{github.workspace}}/vimeo_download/download_vimeo.zip
         asset_name: download_vimeo.zip
         asset_content_type: application/zip
