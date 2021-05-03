@@ -35,12 +35,12 @@ jobs:
       working-directory: ${{github.workspace}}/build
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build ../vimeo_download --config $BUILD_TYPE;
+      run: cmake --build ../vimeo_download --config $BUILD_TYPE
 
     - name: zipping
       working-directory: ${{github.workspace}}/build
       shell: bash
-      run: ls
+      run: zip ${{github.workspace}}/build/download_vimeo.zip ${{github.workspace}}/build/download_vimeo
     
     - name: Create Release
       uses: actions/create-release@v1
