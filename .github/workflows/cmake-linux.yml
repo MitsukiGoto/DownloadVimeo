@@ -1,6 +1,9 @@
 name: CMake-Linux
 
-on: push
+on: 
+  push:
+    tags-ignore:
+      - 'v*'
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
