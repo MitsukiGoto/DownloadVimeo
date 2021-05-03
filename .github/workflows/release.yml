@@ -38,7 +38,7 @@ jobs:
       run: |
        cmake --build ../vimeo_download --config $BUILD_TYPE
        cd ../build
-       ls -la
+       cp download_vimeo ../download_vimeo
 
     - name: zipping
       working-directory: ${{github.workspace}}/build
