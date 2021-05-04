@@ -7,6 +7,31 @@ https://github.com/tplgy/cppcodec \
 https://github.com/eMBee/vimeo-download
 ### Features
 This enables you to download videos hosted by vimeo which cannot download by youtube-dl.
+### Installation
+Download bainary that fits your OS. \
+Latest Release here: \
+Ubuntu:
+https://github.com/MitsukiGoto/DownloadVimeo/releases/tag/v1.10 \
+Mac:
+https://github.com/MitsukiGoto/DownloadVimeo/releases/tag/mac-v1.10
+### Usage
+This requires an unusual link like "http://...master.json?base64_init=1" \
+To get this url:
+1. Open the network tab in the inspector
+![image1](images/image1.png)
+2. Filter the url like this.
+![image2](images/image2.png)
+3. Right click and copy the link.
+![image3](images/image3.png)
+
+After you get that url, run the commmand 
+```
+./vimeo_download --url [that url] --output [video's name]
+```
+### Build yourself
+<details>
+<summary>How to build</summary>
+
 ### Requirement
 libcurl, boost.program_options, ffmpeg
 ### Installation
@@ -43,17 +68,4 @@ Follow the instructions given above. \
 **For Other Linux or Pure Windows Users** \
 Sorry, this project is not supporting these platforms now. \
 But this is going to come soon!!!!
-### Usage
-This requires an unusual link like "http://...master.json?base64_init=1" \
-To get this url:
-1. Open the network tab in the inspector
-![image1](images/image1.png)
-2. Filter the url like this.
-![image2](images/image2.png)
-3. Right click and copy the link.
-![image3](images/image3.png)
-
-After you get that url, run the commmand 
-```
-./vimeo_download --url [that url] --output [video's name]
-```
+</details>
