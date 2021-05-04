@@ -3,7 +3,8 @@ name: CMake-Linux
 on:
   push:
     tags-ignore:
-      - "v*"
+      - "mac-v*"
+      - "ubuntu-v*"
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
