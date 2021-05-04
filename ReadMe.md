@@ -15,7 +15,7 @@ https://github.com/MitsukiGoto/DownloadVimeo/releases/tag/v1.10 \
 Mac:
 https://github.com/MitsukiGoto/DownloadVimeo/releases/tag/mac-v1.10
 ### Usage
-This requires an unusual link like "http://...master.json?base64_init=1" \
+This requires an unusual link like "http://...master.json?query_string_ranges=1&base64_init=1" \
 To get this url:
 1. Open the network tab in the inspector
 ![image1](images/image1.png)

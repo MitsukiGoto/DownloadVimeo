@@ -5,6 +5,8 @@ on:
     tags-ignore:
       - "mac-v*"
       - "ubuntu-v*"
+    branches:
+      - "*"
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
