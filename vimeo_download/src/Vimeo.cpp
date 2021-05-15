@@ -26,11 +26,14 @@ Vimeo::Vimeo(const std::string &output_name, const std::string &url, std::unique
     this->json = std::move(json);
     this->base_url = Utils::getBaseUrl(url, this->json->v.get<picojson::object>()["base_url"].to_str());
     this->home_dir = std::string(std::getenv("HOME"));
-    std::cout << base_url << std::endl;
+    if (this->isVerbose)
+    {
+        std::cout << base_url << std::endl;
+    }
     auto paths = createDirectory();
     this->tmp_dir = std::get<0>(paths);
     this->save_dir = std::get<1>(paths);
-    std::cout << output_name << std::endl;
+    std::cout << "Output file name will be: " << output_name << std::endl;
     if (this->output_name.find(".mp4") == std::string::npos)
     {
         if (this->isVerbose)
@@ -63,7 +66,7 @@ void Vimeo::merge()
     std::system(command_.c_str());
     std::cout << "\u001b[35m"
               << "Merging Audio and Video has successflly done" << std::endl;
-    std::cout << "The Video was saved to:" << this->home_dir << "/Desktop/Vimeo/" << this->output_name << std::endl;
+    std::cout << "The Video was saved to: " << this->home_dir << "/Desktop/Vimeo/" << this->output_name << std::endl;
     std::filesystem::remove_all(this->tmp_dir);
     std::cout << "Cleaning Process Started" << std::endl;
     std::cout << "\u001b[31m"
@@ -80,8 +83,10 @@ Vimeo &Vimeo::download()
 {
 #if defined(__MACH__) || defined(__linux)
     // #ifdef DEBUGING
-    auto process1 = std::thread([this] { this->downloadVideo(); });
-    auto process2 = std::thread([this] { this->downloadAudio(); });
+    auto process1 = std::thread([this]
+                                { this->downloadVideo(); });
+    auto process2 = std::thread([this]
+                                { this->downloadAudio(); });
     process1.join();
     process2.join();
 #else
@@ -91,7 +96,8 @@ Vimeo &Vimeo::download()
     return *this;
 }
 
-std::tuple<std::string, std::string> Vimeo::createDirectory() {
+std::tuple<std::string, std::string> Vimeo::createDirectory()
+{
     auto now_c = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::stringstream ss;
     ss << now_c;
@@ -112,13 +118,16 @@ void Vimeo::downloadVideo()
         std::cout << "video_base_url: " << video_base_url << std::endl;
     }
     downloadSegmentAndMerge(highest_video, video_base_url, "video");
-    std::cout << "\u001b[36m"
-              << "Downloading Video has successflly done"
-              << "\u001b[0m" << std::endl;
     if (this->isVerbose)
     {
+        std::cout << "\u001b[36m"
+                  << "Downloading Video has successflly done"
+                  << "\u001b[0m" << std::endl;
         std::cout << "Only Video at: " << this->tmp_dir + "v.mp4" << std::endl;
     }
+    std::cout <<  "\n" << "\u001b[36m"
+              << "Downloading Video&Audio has successflly done"
+              << "\u001b[0m" << std::endl;
 }
 
 void Vimeo::downloadAudio()
@@ -131,19 +140,20 @@ void Vimeo::downloadAudio()
         std::cout << "audio_base_url: " << audio_base_url << std::endl;
     }
     downloadSegmentAndMerge(audio, audio_base_url, "audio");
-    std::cout << "\u001b[32m"
-              << "Downloading Audio has successflly done"
-              << "\u001b[0m" << std::endl;
     if (this->isVerbose)
     {
+        std::cout << "\u001b[32m"
+                  << "Downloading Audio has successflly done"
+                  << "\u001b[0m" << std::endl;
         std::cout << "Only Audio at: " << this->tmp_dir + "v.mp4" << std::endl;
     }
 }
 
-picojson::object Vimeo::getHighestQualityVideoPartOfJson() {
+picojson::object Vimeo::getHighestQualityVideoPartOfJson()
+{
     auto video = json->v.get<picojson::object>()["video"].get<picojson::array>();
     int i = 0;
-    // The most high quality video has most largest "height" value
+    // The highest quality video has most largest "height" value
     std::vector<std::tuple<int, int>> heights;
     for (auto &content : video)
     {
@@ -156,26 +166,42 @@ picojson::object Vimeo::getHighestQualityVideoPartOfJson() {
     return video[std::get<1>(heights[0])].get<picojson::object>();
 }
 
-void Vimeo::downloadSegmentAndMerge(picojson::object& obj, std::string base_url, std::string mode)
+void Vimeo::downloadSegmentAndMerge(picojson::object &obj, std::string base_url, std::string mode)
 {
     std::string tmpFileDir;
-    if(mode == "video") {
+    if (Utils::isVideo(mode))
+    {
         tmpFileDir = this->tmp_dir + "v.mp4";
-    } else if (mode=="audio"){
+    }
+    else if (Utils::isAudio(mode))
+    {
         tmpFileDir = this->tmp_dir + "a.mp3";
-    } else {
+    }
+    else
+    {
         std::cerr << "Unknown mode argument were given.";
         std::exit(1);
     }
     decodeInitSegmentAndMerge(obj, tmpFileDir);
-    for (auto &segment : obj.at("segments").get<picojson::array>())
+    auto array = obj.at("segments").get<picojson::array>();
+    int array_size = array.size();
+    for (int index = 0; auto &segment : array)
     {
+        if (Utils::isVideo(mode))
+        {
+            std::cout << "\r"
+                      << "Progress: " << "[" << "\u001b[31m"
+                      << std::string(index, '.') << std::string(array_size - index - 1, ' ') << "\u001b[0m"
+                      << "]" << std::flush;
+        }
         std::string segment_url = base_url + segment.get<picojson::object>()["url"].to_str();
         Requests::get(segment_url, tmpFileDir);
+        index++;
     }
 }
 
-void Vimeo::decodeInitSegmentAndMerge(const picojson::object& obj, std::string tmpFileDir) {
+void Vimeo::decodeInitSegmentAndMerge(const picojson::object &obj, std::string tmpFileDir)
+{
     std::ofstream ofs(tmpFileDir, std::ios::out | std::ios::binary);
     std::stringstream s;
     auto decoded = Utils::decode(obj.at("init_segment").to_str());

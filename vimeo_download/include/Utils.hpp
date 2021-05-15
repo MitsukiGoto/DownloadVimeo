@@ -55,4 +55,12 @@ namespace Utils
         }
         return vecToString(splitted);
     }
+    bool isVideo(std::string mode) {
+        if(mode == "video") return true;
+        return false;
+    }
+    bool isAudio(std::string mode) {
+        if(mode == "audio") return true;
+        return false;
+    }
 }

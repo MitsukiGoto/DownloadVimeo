@@ -53,7 +53,6 @@ void Requests::get(std::string &url, const std::string &path)
     curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, +([](char *ptr, std::size_t size, std::size_t nmemb, void *user_data) {
                          std::ofstream *out = static_cast<std::ofstream *>(user_data);
-                         std::cout << user_data << std::endl;
                          size_t nbytes = size * nmemb;
                          out->write(ptr, nbytes);
                          return nbytes;
