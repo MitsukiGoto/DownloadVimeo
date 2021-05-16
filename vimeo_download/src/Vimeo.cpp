@@ -96,7 +96,7 @@ void Vimeo::merge()
 
 Vimeo &Vimeo::download()
 {
-#if defined(__MACH__) || defined(__linux)
+#if defined(__MACH__) || defined(__linux) || defined(_WIN64)
     // #ifdef DEBUGING
     auto process1 = std::thread([this]
                                 { this->downloadVideo(); });
