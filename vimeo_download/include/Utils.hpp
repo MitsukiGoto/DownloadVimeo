@@ -55,6 +55,7 @@ namespace Utils
         }
         return vecToString(splitted);
     }
+#ifdef _Win64
     std::string get_enviroment(std::string name)
     {
         size_t buf;
@@ -65,6 +66,7 @@ namespace Utils
             throw std::runtime_error("not such environment variable");
         return std::string(buffer);
     }
+#endif
     bool isVideo(std::string mode)
     {
         if (mode == "video")
