@@ -55,12 +55,26 @@ namespace Utils
         }
         return vecToString(splitted);
     }
-    bool isVideo(std::string mode) {
-        if(mode == "video") return true;
+    std::string get_enviroment(std::string name)
+    {
+        size_t buf;
+        char buffer[128];
+        if (getenv_s(&buf, buffer, 128, name.c_str()))
+            throw std::runtime_error("read error");
+        if (buf == 0)
+            throw std::runtime_error("not such environment variable");
+        return std::string(buffer);
+    }
+    bool isVideo(std::string mode)
+    {
+        if (mode == "video")
+            return true;
         return false;
     }
-    bool isAudio(std::string mode) {
-        if(mode == "audio") return true;
+    bool isAudio(std::string mode)
+    {
+        if (mode == "audio")
+            return true;
         return false;
     }
 }
