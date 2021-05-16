@@ -4,7 +4,7 @@ add_executable(download_vimeo main.cpp)
 
 set(CMAKE_CXX_COMPILER clang++)
 if(WIN32)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
 endif()
 if(UNIX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")

@@ -25,7 +25,12 @@ Vimeo::Vimeo(const std::string &output_name, const std::string &url, std::unique
 {
     this->json = std::move(json);
     this->base_url = Utils::getBaseUrl(url, this->json->v.get<picojson::object>()["base_url"].to_str());
+#if defined(__MACH__) || defined(__linux)
     this->home_dir = std::string(std::getenv("HOME"));
+#endif
+#ifdef _WIN64
+    this->home_dir = Utils::get_enviroment("USERPROFILE");
+#endif
     if (this->isVerbose)
     {
         std::cout << base_url << std::endl;
@@ -33,7 +38,6 @@ Vimeo::Vimeo(const std::string &output_name, const std::string &url, std::unique
     auto paths = createDirectory();
     this->tmp_dir = std::get<0>(paths);
     this->save_dir = std::get<1>(paths);
-    std::cout << "Output file name will be: " << output_name << std::endl;
     if (this->output_name.find(".mp4") == std::string::npos)
     {
         if (this->isVerbose)
@@ -42,22 +46,31 @@ Vimeo::Vimeo(const std::string &output_name, const std::string &url, std::unique
         }
         this->output_name += ".mp4";
     }
+    std::cout << "Output file name will be: " << this->output_name << std::endl;
 }
 
 template <typename T, typename U>
 auto Vimeo::command(T tmp, U name)
 {
-    auto command = "ffmpeg -i " + tmp + "a.mp3 " + "-i " + tmp + "v.mp4" + " -acodec" + " copy" + " -vcodec" + " copy " + this->home_dir + "/Desktop/Vimeo/" + name;
+    auto command = "ffmpeg -i " + tmp + "a.mp3 " + "-i " + tmp + "v.mp4" + " -acodec" + " copy" + " -vcodec" + " copy " + this->home_dir
+#if defined(__MACH__) || defined(__linux)
+                   + "/Desktop/Vimeo/" + name;
+#endif
+#ifdef _WIN64
+    + "\\Desktop\\Vimeo/" + name;
+#endif
     return command;
 }
 
 void Vimeo::merge()
 {
-#if defined(__MACH__) || defined(__linux)
+#if defined(__MACH__) || defined(__linux) || defined(_WIN64)
     auto command_ = command(this->tmp_dir, this->output_name);
     if (!this->isVerbose)
     {
-        command_ += " >/dev/null 2>&1";
+#if defined(__MACH__) || defined(__linux) || defined(_WIN64)
+        command_ += " -loglevel quiet";
+#endif
     }
     else
     {
@@ -66,16 +79,18 @@ void Vimeo::merge()
     std::system(command_.c_str());
     std::cout << "\u001b[35m"
               << "Merging Audio and Video has successflly done" << std::endl;
+#if defined(__MACH__) || defined(__linux)
     std::cout << "The Video was saved to: " << this->home_dir << "/Desktop/Vimeo/" << this->output_name << std::endl;
+#endif
+#ifdef _WIN64
+    std::cout << "The Video was saved to: " << this->home_dir << "\\Desktop\\Vimeo\\" << this->output_name << std::endl;
+#endif
     std::filesystem::remove_all(this->tmp_dir);
     std::cout << "Cleaning Process Started" << std::endl;
     std::cout << "\u001b[31m"
               << "Temp Folder has removed: " << this->tmp_dir << std::endl;
     std::cout << "Cleaning Process End"
               << "\u001b[0m" << std::endl;
-#endif
-#ifdef __WIN64
-    std::cout << "Sorry, Merging Audio and Video doesn't support on Windows now" << std::endl;
 #endif
 }
 
@@ -93,6 +108,10 @@ Vimeo &Vimeo::download()
     this->downloadVideo();
     this->downloadAudio();
 #endif
+    std::cout << "\n"
+              << "\u001b[36m"
+              << "Downloading Video&Audio has successflly done"
+              << "\u001b[0m" << std::endl;
     return *this;
 }
 
@@ -101,9 +120,15 @@ std::tuple<std::string, std::string> Vimeo::createDirectory()
     auto now_c = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::stringstream ss;
     ss << now_c;
+#if defined(__MACH__) || defined(__linux)
     std::string tmp = std::filesystem::temp_directory_path().string() + "/dlvimeo/" + ss.str() + "/";
-    std::filesystem::create_directories(tmp);
     std::string saved = this->home_dir + "/Desktop/Vimeo";
+#endif
+#ifdef _WIN64
+    std::string tmp = std::filesystem::temp_directory_path().string() + "\\dlvimeo\\" + ss.str() + "\\";
+    std::string saved = this->home_dir + "\\Desktop\\Vimeo";
+#endif
+    std::filesystem::create_directories(tmp);
     std::filesystem::create_directories(saved);
     std::tuple<std::string, std::string> paths = {tmp, saved};
     return paths;
@@ -125,9 +150,6 @@ void Vimeo::downloadVideo()
                   << "\u001b[0m" << std::endl;
         std::cout << "Only Video at: " << this->tmp_dir + "v.mp4" << std::endl;
     }
-    std::cout <<  "\n" << "\u001b[36m"
-              << "Downloading Video&Audio has successflly done"
-              << "\u001b[0m" << std::endl;
 }
 
 void Vimeo::downloadAudio()
@@ -190,7 +212,9 @@ void Vimeo::downloadSegmentAndMerge(picojson::object &obj, std::string base_url,
         if (Utils::isVideo(mode))
         {
             std::cout << "\r"
-                      << "Progress: " << "[" << "\u001b[31m"
+                      << "Progress: "
+                      << "["
+                      << "\u001b[31m"
                       << std::string(index, '.') << std::string(array_size - index - 1, ' ') << "\u001b[0m"
                       << "]" << std::flush;
         }
