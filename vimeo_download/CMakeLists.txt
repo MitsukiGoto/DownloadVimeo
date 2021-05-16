@@ -3,8 +3,11 @@ project(download_vimeo)
 add_executable(download_vimeo main.cpp)
 
 set(CMAKE_CXX_COMPILER clang++)
+if(WIN32)
 set(CMAKE_CXX_STANDARD 20)
+endif()
 if(UNIX)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 add_definitions(-Wall -Wextra -O2)
 endif()
 
