@@ -20,10 +20,9 @@ namespace
 {
     auto parseArgument(int argc, const char **argv)
     {
-        std::tuple<std::string, std::string, bool, bool> options;
         boost::program_options::options_description description("Download Vimeo Video even though it is set Private \n"
                                                                 "Usage: vimeo_download [-u URL] [-o Output]");
-        description.add_options()("url,u", boost::program_options::value<std::string>(), "Set Target URL")("output,o", boost::program_options::value<std::string>(), "Set output name")("continue,c", "Other Download")("help,h", "Help")("verbose", "Turn on Verbose Mode")("version", "Show Version");
+        description.add_options()("url,u", boost::program_options::value<std::string>(), "Set Target URL")("output,o", boost::program_options::value<std::string>(), "Set output name")("limit-progress,l", boost::program_options::value<std::string>(),"Limit progress dots any you want")("continue,c", "Other Download")("help,h", "Help")("verbose", "Turn on Verbose Mode")("version", "Show Version");
 
         boost::program_options::variables_map vm;
         store(boost::program_options::parse_command_line(argc, argv, description), vm);
@@ -48,28 +47,26 @@ namespace
                       << "\n";
             std::exit(1);
         }
-        std::get<0>(options) = vm["output"].as<std::string>();
-        std::get<1>(options) = vm["url"].as<std::string>();
+        bool isVerbose = false;
         if (vm.count("verbose"))
         {
-            std::get<2>(options) = true;
+            isVerbose = true;
         }
-        else
-        {
-            std::get<2>(options) = false;
+        int progress_limit = 40;
+        if(vm.count("limit-progress")) {
+            progress_limit = std::stoi(vm["limit-progress"].as<std::string>());
         }
-        auto parsedArg = std::make_unique<ParsedArg>(std::get<0>(options), std::get<1>(options), std::get<2>(options));
+        auto parsedArg = std::make_unique<ParsedArg>(vm["output"].as<std::string>(), vm["url"].as<std::string>(), isVerbose, progress_limit);
         return parsedArg;
     }
 } // namespace
 
 int main(int argc, const char *argv[])
 {
-    //     Expected: output, url
     auto arg = parseArgument(argc, argv);
     if (arg->isVerbose)
         std::cout << "Verbose Mode on" << std::endl;
-    auto vimeo = std::make_unique<Vimeo>(arg->outputName, arg->url, Requests::get(arg->url), arg->isVerbose);
+    auto vimeo = std::make_unique<Vimeo>(arg->outputName, arg->url, Requests::get(arg->url), arg->isVerbose, arg->progress_limit);
     vimeo->download().merge();
 #ifdef __APPLE__
     std::system("osascript -e 'display notification \"Finish\"'");

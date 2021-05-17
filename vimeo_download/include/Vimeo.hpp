@@ -17,7 +17,7 @@
 class Vimeo
 {
 public:
-    Vimeo(const std::string &, const std::string &, std::unique_ptr<JSON>, bool verbose);
+    Vimeo(const std::string &, const std::string &, std::unique_ptr<JSON>, bool verbose, int progress_limit);
     Vimeo() = delete;
     Vimeo &download();
     void merge();
@@ -37,6 +37,7 @@ private:
     std::string home_dir;
     std::string output_name;
     bool isVerbose;
+    int progress_limit;
     template <typename T, typename U>
     auto command(T tmp, U name);
 };
