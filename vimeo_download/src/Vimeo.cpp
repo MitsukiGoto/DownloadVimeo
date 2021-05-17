@@ -10,6 +10,7 @@
 #include "Requests.hpp"
 #include "../include/cppcodec/base64_rfc4648.hpp"
 #include "../include/Utils.hpp"
+#include "../include/Colors.hpp"
 #include <regex>
 #include <tuple>
 #include <filesystem>
@@ -21,7 +22,7 @@
 #include <sstream>
 #include <iterator>
 
-Vimeo::Vimeo(const std::string &output_name, const std::string &url, std::unique_ptr<JSON> json, bool isVerbose) : url(url), output_name(output_name), isVerbose(isVerbose)
+Vimeo::Vimeo(const std::string &output_name, const std::string &url, std::unique_ptr<JSON> json, bool isVerbose, int progress_limit) : url(url), output_name(output_name), isVerbose(isVerbose), progress_limit(progress_limit)
 {
     this->json = std::move(json);
     this->base_url = Utils::getBaseUrl(url, this->json->v.get<picojson::object>()["base_url"].to_str());
@@ -57,7 +58,7 @@ auto Vimeo::command(T tmp, U name)
                    + "/Desktop/Vimeo/" + name;
 #endif
 #ifdef _WIN64
-    + "\\Desktop\\Vimeo/" + name;
+    +"\\Desktop\\Vimeo/" + name;
 #endif
     return command;
 }
@@ -77,7 +78,7 @@ void Vimeo::merge()
         std::cout << command_ << std::endl;
     }
     std::system(command_.c_str());
-    std::cout << "\u001b[35m"
+    std::cout << Utils::Colors::MAGENTA
               << "Merging Audio and Video has successflly done" << std::endl;
 #if defined(__MACH__) || defined(__linux)
     std::cout << "The Video was saved to: " << this->home_dir << "/Desktop/Vimeo/" << this->output_name << std::endl;
@@ -87,10 +88,10 @@ void Vimeo::merge()
 #endif
     std::filesystem::remove_all(this->tmp_dir);
     std::cout << "Cleaning Process Started" << std::endl;
-    std::cout << "\u001b[31m"
+    std::cout << Utils::Colors::RED
               << "Temp Folder has removed: " << this->tmp_dir << std::endl;
     std::cout << "Cleaning Process End"
-              << "\u001b[0m" << std::endl;
+              << Utils::Colors::RESET << std::endl;
 #endif
 }
 
@@ -109,9 +110,9 @@ Vimeo &Vimeo::download()
     this->downloadAudio();
 #endif
     std::cout << "\n"
-              << "\u001b[36m"
+              << Utils::Colors::CYAN
               << "Downloading Video&Audio has successflly done"
-              << "\u001b[0m" << std::endl;
+              << Utils::Colors::RESET << std::endl;
     return *this;
 }
 
@@ -145,9 +146,9 @@ void Vimeo::downloadVideo()
     downloadSegmentAndMerge(highest_video, video_base_url, "video");
     if (this->isVerbose)
     {
-        std::cout << "\u001b[36m"
+        std::cout << Utils::Colors::CYAN
                   << "Downloading Video has successflly done"
-                  << "\u001b[0m" << std::endl;
+                  << Utils::Colors::RESET << std::endl;
         std::cout << "Only Video at: " << this->tmp_dir + "v.mp4" << std::endl;
     }
 }
@@ -164,9 +165,9 @@ void Vimeo::downloadAudio()
     downloadSegmentAndMerge(audio, audio_base_url, "audio");
     if (this->isVerbose)
     {
-        std::cout << "\u001b[32m"
+        std::cout << Utils::Colors::GREEN
                   << "Downloading Audio has successflly done"
-                  << "\u001b[0m" << std::endl;
+                  << Utils::Colors::RESET << std::endl;
         std::cout << "Only Audio at: " << this->tmp_dir + "v.mp4" << std::endl;
     }
 }
@@ -207,19 +208,39 @@ void Vimeo::downloadSegmentAndMerge(picojson::object &obj, std::string base_url,
     decodeInitSegmentAndMerge(obj, tmpFileDir);
     auto array = obj.at("segments").get<picojson::array>();
     int array_size = array.size();
+    bool overLimit = false;
+    if (array_size >= progress_limit)
+    {
+        overLimit = true;
+        if (isVerbose)
+        {
+            std::cout << "element size is larger than limit" << std::endl;
+        }
+    }
     for (int index = 0; auto &segment : array)
     {
-        if (Utils::isVideo(mode))
+        if (Utils::isVideo(mode) && overLimit == false)
         {
             std::cout << "\r"
                       << "Progress: "
                       << "["
-                      << "\u001b[31m"
-                      << std::string(index, '.') << std::string(array_size - index - 1, ' ') << "\u001b[0m"
+                      << Utils::Colors::RED
+                      << std::string(index, '.') << std::string(array_size - index - 1, ' ') << Utils::Colors::RESET
                       << "]" << std::flush;
+        }
+        else if (Utils::isVideo(mode) && overLimit == true)
+        {
+            std::cout << "\r"
+                      << "Progress: "
+                      << index << " / " << array_size << std::flush;
         }
         std::string segment_url = base_url + segment.get<picojson::object>()["url"].to_str();
         Requests::get(segment_url, tmpFileDir);
+        if(Utils::isVideo(mode) && index == array_size -1) {
+            std::cout << "\r" << std::string(20, ' ') << "\r"
+                      << "Progress: "
+                      << "Done!" << std::flush;
+        }
         index++;
     }
 }
