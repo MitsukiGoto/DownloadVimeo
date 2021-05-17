@@ -55,7 +55,7 @@ namespace Utils
         }
         return vecToString(splitted);
     }
-#ifdef _Win64
+#ifdef _WIN64
     std::string get_enviroment(std::string name)
     {
         size_t buf;

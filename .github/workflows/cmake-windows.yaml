@@ -29,17 +29,24 @@ jobs:
         run: cmake -E make_directory ${{github.workspace}}/build -DACTIONS=TRUE
 
       - name: Install Vcpkg
-        working-directory: ${{github.workspace}}/vcppkg
+        working-directory: ${{github.workspace}}/build
+        run: git clone "https://github.com/microsoft/vcpkg.git"
+          
+      - name: Activate Vcpkg
+        working-directory: ${{github.workspace}}/build/vcpkg
         run: |
-          git clone "https://github.com/microsoft/vcpkg.git"
           .\bootstrap-vcpkg.bat
-
+          .\vcpkg integrate install
 
       - name: Install Boost Lib
-        working-directory: ${{github.workspace}}/vcppkg
+        working-directory: ${{github.workspace}}/build/vcpkg
         run: |
-          vcpkg install boost-program-options
-          vcpkg install curl
+          .\vcpkg install boost-program-options:x64-windows
+          .\vcpkg install curl:x64-windows
+          
+      - name: Check Libs
+        working-directory: ${{github.workspace}}/build/vcpkg/installed/x64-windows/include
+        run: dir
 
       - name: Configure CMake
         # Use a bash shell so we can use the same syntax for environment variable
@@ -53,7 +60,7 @@ jobs:
 
       - name: Build
         working-directory: ${{github.workspace}}/build
-        shell: bash
+        shell: powershell
         # Execute the build.  You can specify a specific target with "--target <NAME>"
         run: cmake --build ../vimeo_download --config $BUILD_TYPE
 
