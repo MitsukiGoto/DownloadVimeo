@@ -93,14 +93,14 @@ jobs:
 
       - name: zipping
         working-directory: ${{github.workspace}}/build
-        shell: bash
-        run: zip ${{github.workspace}}/vimeo_download/download_vimeo_windows.zip ${{github.workspace}}/vimeo_download/download_vimeo.exe
+        shell: powershell
+        run: powershell -Command "Compress-Archive ${{github.workspace}}\vimeo_download\Debug\download_vimeo.exe ${{github.workspace}}\vimeo_download\download_vimeo_windows.zip"
 
       - name: save dist
         uses: actions/upload-artifact@v2
         with:
           name: download_vimeo_windows.zip
-          path: ${{github.workspace}}/vimeo_download/download_vimeo_windows.zip
+          path: ${{github.workspace}}\vimeo_download\download_vimeo_windows.zip
 
   build-macos:
     name: Create Release Binary
