@@ -135,5 +135,29 @@ jobs:
           name: download_vimeo_mac.zip
           path: ${{github.workspace}}/vimeo_download/download_vimeo_mac.zip
 
-  # publish-relase:
-  #   needs: [build-ubuntu, build-windows, build-macos]
+  publish-relase:
+    name: Create All Release
+    needs: [build-ubuntu, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    - name: Download the artifact (Linux)
+      uses: actions/download-artifact@v2
+      with:
+        name: download_vimeo_ubuntu.zip
+    - name: Download the artifact (macOS)
+      uses: actions/download-artifact@v2
+      with:
+        name: download_vimeo_mac.zip
+    - name: Download the artifact (Windows)
+      uses: actions/download-artifact@v2
+      with:
+        name: download_vimeo_windows.zip
+    - name: Release
+      run: |
+        set -eux
+        hub release create \
+          -a download_vimeo_ubuntu.zip \
+          -a download_vimeo_mac.zip \
+          -a download_vimeo_windows.zip \
+          -m "Release for All Platforms"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
