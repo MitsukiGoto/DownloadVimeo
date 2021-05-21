@@ -44,7 +44,6 @@ jobs:
 
       - name: save dist
         uses: actions/upload-artifact@v2
-        if: !failure()
         with:
           name: download_vimeo_ubuntu.zip
           path: ${{github.workspace}}/vimeo_download/download_vimeo_ubuntu.zip
@@ -99,7 +98,6 @@ jobs:
 
       - name: save dist
         uses: actions/upload-artifact@v2
-        if: !failure()
         with:
           name: download_vimeo_windows.zip
           path: ${{github.workspace}}/vimeo_download/download_vimeo_windows.zip
@@ -133,7 +131,6 @@ jobs:
 
       - name: save dist
         uses: actions/upload-artifact@v2
-        if: !failure()
         with:
           name: download_vimeo_mac.zip
           path: ${{github.workspace}}/vimeo_download/download_vimeo_mac.zip
