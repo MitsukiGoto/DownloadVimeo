@@ -139,25 +139,61 @@ jobs:
     name: Create All Release
     needs: [build-ubuntu, build-windows, build-macos]
     runs-on: ubuntu-latest
-    - name: Download the artifact (Linux)
-      uses: actions/download-artifact@v2
-      with:
-        name: download_vimeo_ubuntu.zip
-    - name: Download the artifact (macOS)
-      uses: actions/download-artifact@v2
-      with:
-        name: download_vimeo_mac.zip
-    - name: Download the artifact (Windows)
-      uses: actions/download-artifact@v2
-      with:
-        name: download_vimeo_windows.zip
-    - name: Release
-      run: |
-        set -eux
-        hub release create \
-          -a download_vimeo_ubuntu.zip \
-          -a download_vimeo_mac.zip \
-          -a download_vimeo_windows.zip \
-          -m "Release for All Platforms"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Download the artifact (Linux)
+        uses: actions/download-artifact@v2
+        with:
+          name: download_vimeo_ubuntu.zip
+          
+      - name: Download the artifact (macOS)
+        uses: actions/download-artifact@v2
+        with:
+          name: download_vimeo_mac.zip
+          
+      - name: Download the artifact (Windows)
+        uses: actions/download-artifact@v2
+        with:
+          name: download_vimeo_windows.zip
+          
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: add binray Ubuntu
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: download_vimeo_ubuntu.zip
+          asset_name: download_vimeo_ubuntu.zip
+          asset_content_type: application/zip
+      
+      - name: add binray macOS
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: download_vimeo_mac.zip
+          asset_name: download_vimeo_mac.zip
+          asset_content_type: application/zip
+          
+      - name: add binray Windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: download_vimeo_windows.zip
+          asset_name: download_vimeo_windows.zip
+          asset_content_type: application/zip
+          
+     
