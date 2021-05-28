@@ -6,7 +6,8 @@ on:
       - "mac-v*"
       - "ubuntu-v*"
     branches:
-      - "*"
+      - "master"
+      - "feature/*"
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -28,9 +29,29 @@ jobs:
         # We'll use this as our working directory for all subsequent commands
         run: cmake -E make_directory ${{github.workspace}}/build -DACTIONS=TRUE
 
-      - name: Install Boost Lib
-        run: sudo apt install libboost-dev; sudo apt install libboost-all-dev; sudo apt install libcurl4-openssl-dev
+      - name: Install libcurl
+        run: sudo apt install libcurl4-openssl-dev
 
+      - name: Cache Boost Libs
+        id: boost_cache
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/boost_1_76_0
+          key: ${{ runner.os }}
+
+      - name: Fetch Boost
+        if: steps.boost_cache.outputs.cache-hit != 'true'
+        working-directory: ${{github.workspace}}
+        run: |
+          wget "https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz"
+          tar zxf boost_1_76_0.tar.gz
+          cd boost_1_76_0
+          ./bootstrap.sh --with-toolset=clang
+      
+      - name: Compile Boost
+        working-directory: ${{github.workspace}}/boost_1_76_0
+        run: sudo ./b2 install -j16 link=static address-model=64 --with-program_options
+        
       - name: Configure CMake
         # Use a bash shell so we can use the same syntax for environment variable
         # access regardless of the host operating system

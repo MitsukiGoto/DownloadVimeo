@@ -72,8 +72,8 @@ jobs:
       - name: Install Boost Lib
         working-directory: ${{github.workspace}}/build/vcpkg
         run: |
-          .\vcpkg install boost-program-options:x64-windows
-          .\vcpkg install curl:x64-windows
+          .\vcpkg install boost-program-options:x64-windows-static
+          .\vcpkg install curl:x64-windows-static
 
       - name: Configure CMake
         # Use a bash shell so we can use the same syntax for environment variable

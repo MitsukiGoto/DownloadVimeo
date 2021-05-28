@@ -6,7 +6,8 @@ on:
       - "mac-v*"
       - "ubuntu-v*"
     branches:
-      - "*"
+      - "master"
+      - "feature/*"
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -28,21 +29,35 @@ jobs:
         # We'll use this as our working directory for all subsequent commands
         run: cmake -E make_directory ${{github.workspace}}/build -DACTIONS=TRUE
 
+      - name: Cache Vcpkg Libs
+        id: vcpkg_cache
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/build/vcpkg
+          key: ${{ runner.os }}
+
       - name: Install Vcpkg
         working-directory: ${{github.workspace}}/build
+        if: steps.vcpkg_cache.outputs.cache-hit != 'true'
         run: git clone "https://github.com/microsoft/vcpkg.git"
           
       - name: Activate Vcpkg
         working-directory: ${{github.workspace}}/build/vcpkg
+        if: steps.vcpkg_cache.outputs.cache-hit != 'true'
         run: |
           .\bootstrap-vcpkg.bat
           .\vcpkg integrate install
 
+      - name: Integrated Install Vcpkg
+        working-directory: ${{github.workspace}}/build/vcpkg
+        run: .\vcpkg integrate install
+
       - name: Install Boost Lib
         working-directory: ${{github.workspace}}/build/vcpkg
+        if: steps.vcpkg_cache.outputs.cache-hit != 'true'
         run: |
-          .\vcpkg install boost-program-options:x64-windows
-          .\vcpkg install curl:x64-windows
+          .\vcpkg install boost-program-options:x64-windows-static
+          .\vcpkg install curl:x64-windows-static
           
       - name: Check Libs
         working-directory: ${{github.workspace}}/build/vcpkg/installed/x64-windows/include
