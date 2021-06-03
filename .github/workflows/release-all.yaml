@@ -7,7 +7,7 @@ name: Create Release
 
 jobs:
   build-ubuntu:
-    name: Create Release Binary
+    name: Create Release Binary Ubuntu
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,9 +18,29 @@ jobs:
         # We'll use this as our working directory for all subsequent commands
         run: cmake -E make_directory ${{github.workspace}}/build -DACTIONS=TRUE
 
-      - name: Install Boost Lib
-        run: sudo apt install libboost-dev; sudo apt install libboost-all-dev; sudo apt install libcurl4-openssl-dev
+      - name: Install libcurl
+        run: sudo apt install libcurl4-openssl-dev
 
+      - name: Cache Boost Libs
+        id: boost_cache
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/boost_1_76_0
+          key: ${{ runner.os }}
+
+      - name: Fetch Boost
+        if: steps.boost_cache.outputs.cache-hit != 'true'
+        working-directory: ${{github.workspace}}
+        run: |
+          wget "https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz"
+          tar zxf boost_1_76_0.tar.gz
+          cd boost_1_76_0
+          ./bootstrap.sh --with-toolset=clang
+      
+      - name: Compile Boost
+        working-directory: ${{github.workspace}}/boost_1_76_0
+        run: sudo ./b2 install -j16 link=static address-model=64 --with-program_options
+        
       - name: Configure CMake
         # Use a bash shell so we can use the same syntax for environment variable
         # access regardless of the host operating system
@@ -49,7 +69,7 @@ jobs:
           path: ${{github.workspace}}/vimeo_download/download_vimeo_ubuntu.zip
 
   build-windows:
-    name: Create Release Binary
+    name: Create Release Binary Windows
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -59,21 +79,35 @@ jobs:
         # We'll use this as our working directory for all subsequent commands
         run: cmake -E make_directory ${{github.workspace}}/build -DACTIONS=TRUE
 
+      - name: Cache Vcpkg Libs
+        id: vcpkg_cache
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/build/vcpkg
+          key: ${{ runner.os }}
+
       - name: Install Vcpkg
         working-directory: ${{github.workspace}}/build
+        if: steps.vcpkg_cache.outputs.cache-hit != 'true'
         run: git clone "https://github.com/microsoft/vcpkg.git"
-
+          
       - name: Activate Vcpkg
         working-directory: ${{github.workspace}}/build/vcpkg
+        if: steps.vcpkg_cache.outputs.cache-hit != 'true'
         run: |
           .\bootstrap-vcpkg.bat
           .\vcpkg integrate install
 
+      - name: Integrated Install Vcpkg
+        working-directory: ${{github.workspace}}/build/vcpkg
+        run: .\vcpkg integrate install
+
       - name: Install Boost Lib
         working-directory: ${{github.workspace}}/build/vcpkg
+        if: steps.vcpkg_cache.outputs.cache-hit != 'true'
         run: |
-          .\vcpkg install boost-program-options:x64-windows
-          .\vcpkg install curl:x64-windows
+          .\vcpkg install boost-program-options:x64-windows-static
+          .\vcpkg install curl:x64-windows-static
 
       - name: Configure CMake
         # Use a bash shell so we can use the same syntax for environment variable
@@ -103,7 +137,7 @@ jobs:
           path: ${{github.workspace}}\vimeo_download\download_vimeo_windows.zip
 
   build-macos:
-    name: Create Release Binary
+    name: Create Release Binary macOS
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
