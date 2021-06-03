@@ -6,7 +6,8 @@ on:
       - "mac-v*"
       - "ubuntu-v*"
     branches:
-      - "*"
+      - "master"
+      - "feature/*"
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
